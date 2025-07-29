@@ -11,17 +11,16 @@ exports.signup = async (req, res) => {
         const { name, address, mobile, state, country, email, password } = req.body
 
         if (!name || !address || !mobile || !state || !country || !email || !password) {
-            return res.send(400).json({ message: 'All Fields required' })
+            return res.status(400).json({ message: 'All Fields required' })
         }
 
         const doesUserExists = await User.findOne({ email })
 
-        if (doesUserExists) return res.send(400).json({ message: 'User already exists' })
+        if (doesUserExists) return res.status(400).json({ message: 'User already exists' })
 
         const user = await User.create({ name, address, mobile, state, country, email, password })
 
         const token = generateToken(user._id);
-        console.log(token)
 
         res.status(201).json({
             user: {
@@ -47,7 +46,7 @@ exports.login = async (req, res) => {
 
         if (!email || !password) return res.status(400).json({ message: 'Email and Password both are required' })
 
-        const isUserThere = User.findOne({ email })
+        const isUserThere = await User.findOne({ email })
 
         if (!isUserThere || isUserThere.password !== password) return res.status(400).json({ error: 'Invalid credentials' });
 
